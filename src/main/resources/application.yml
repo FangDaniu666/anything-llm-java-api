@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: anything-llm-java-api
+anything-llm:
+  url: "http://localhost:3001/api/v1/workspace/ollama-demo/chat"
+  token: "DBCFN9E-RBX44G9-P9N5SHN-V6VSGQC"
