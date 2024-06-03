@@ -2,7 +2,6 @@ package com.daniu.controller;
 
 import com.daniu.common.BaseResponse;
 import com.daniu.common.ResultUtils;
-import com.daniu.config.AnythingllmConfig;
 import com.daniu.constant.AnythingllmConstant;
 import com.daniu.model.chat.ChatRequest;
 import com.daniu.model.chat.ChatResponse;
