@@ -3,9 +3,11 @@ package com.daniu.controller;
 import com.daniu.common.BaseResponse;
 import com.daniu.common.ResultUtils;
 import com.daniu.constant.AnythingllmConstant;
+import com.daniu.model.anythingllm.RemoteChatRequest;
 import com.daniu.model.chat.ChatRequest;
 import com.daniu.model.chat.ChatResponse;
 import jakarta.annotation.Resource;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,13 +36,16 @@ public class ChatController {
     public BaseResponse<ChatResponse> chat(@RequestBody ChatRequest chatRequest) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + anythingllmConstant.token);
+        RemoteChatRequest remoteChatRequest = new RemoteChatRequest();
+        BeanUtils.copyProperties(chatRequest, remoteChatRequest);
 
-        HttpEntity<ChatRequest> entity = new HttpEntity<>(chatRequest, headers);
-        System.out.println(anythingllmConstant.workspaceUrl + "/ollama-demo/chat");
+        String workspace = chatRequest.getWorkspace();
 
+        HttpEntity<RemoteChatRequest> entity = new HttpEntity<>(remoteChatRequest, headers);
+        System.out.println(anythingllmConstant.workspaceUrl + "/" + workspace + "/chat");
 
         ResponseEntity<ChatResponse> response = restTemplate.exchange(
-                anythingllmConstant.workspaceUrl + "/ollama-demo/chat",
+                anythingllmConstant.workspaceUrl + "/" + workspace + "/chat",
                 HttpMethod.POST,
                 entity,
                 ChatResponse.class
