@@ -3,6 +3,7 @@ package com.daniu.controller;
 import com.daniu.common.BaseResponse;
 import com.daniu.common.ResultUtils;
 import com.daniu.config.AnythingllmConfig;
+import com.daniu.constant.AnythingllmConstant;
 import com.daniu.model.chat.ChatRequest;
 import com.daniu.model.chat.ChatResponse;
 import jakarta.annotation.Resource;
@@ -21,24 +22,26 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping("/api/v1/workspace")
+@RequestMapping("/workspace")
 public class ChatController {
 
     @Resource
     private RestTemplate restTemplate;
 
     @Resource
-    private AnythingllmConfig anythingllmApiConfig;
+    private AnythingllmConstant anythingllmConstant;
 
     @PostMapping(value = "/chat", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<ChatResponse> chat(@RequestBody ChatRequest chatRequest) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + anythingllmApiConfig.getToken());
+        headers.set("Authorization", "Bearer " + anythingllmConstant.token);
 
         HttpEntity<ChatRequest> entity = new HttpEntity<>(chatRequest, headers);
+        System.out.println(anythingllmConstant.workspaceUrl + "/ollama-demo/chat");
+
 
         ResponseEntity<ChatResponse> response = restTemplate.exchange(
-                anythingllmApiConfig.getUrl(),
+                anythingllmConstant.workspaceUrl + "/ollama-demo/chat",
                 HttpMethod.POST,
                 entity,
                 ChatResponse.class
