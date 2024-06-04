@@ -1,8 +1,10 @@
 package com.daniu.controller;
 
 import com.daniu.common.BaseResponse;
+import com.daniu.common.ErrorCode;
 import com.daniu.common.ResultUtils;
 import com.daniu.constant.AnythingllmConstant;
+import com.daniu.exception.ThrowUtils;
 import com.daniu.model.anythingllm.RemoteChatRequest;
 import com.daniu.model.chat.ChatRequest;
 import com.daniu.model.chat.ChatResponse;
@@ -44,21 +46,21 @@ public class ChatController {
                 new ParameterizedTypeReference<>() {
                 }
         );
-
         WorkspaceResponseWrapper workspaceResponses = response.getBody();
+        ThrowUtils.throwIf(workspaceResponses == null, ErrorCode.OPERATION_ERROR, "获取工作空间列表失败");
 
         return ResultUtils.success(workspaceResponses.getWorkspaces());
     }
 
     @PostMapping(value = "/chat", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<ChatResponse> chat(@RequestBody ChatRequest chatRequest) {
+        ThrowUtils.throwIf(chatRequest == null, ErrorCode.PARAMS_ERROR, "请求参数错误");
+
         RemoteChatRequest remoteChatRequest = new RemoteChatRequest();
         BeanUtils.copyProperties(chatRequest, remoteChatRequest);
-
         String workspace = chatRequest.getWorkspace();
 
         HttpEntity<RemoteChatRequest> entity = new HttpEntity<>(remoteChatRequest);
-        System.out.println(anythingllmConstant.workspaceUrl + "/" + workspace + "/chat");
 
         ResponseEntity<ChatResponse> response = restTemplate.exchange(
                 anythingllmConstant.workspaceUrl + "/" + workspace + "/chat",
