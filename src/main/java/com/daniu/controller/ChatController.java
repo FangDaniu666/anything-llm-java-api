@@ -34,14 +34,12 @@ public class ChatController {
 
     @PostMapping(value = "/chat", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<ChatResponse> chat(@RequestBody ChatRequest chatRequest) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + anythingllmConstant.token);
         RemoteChatRequest remoteChatRequest = new RemoteChatRequest();
         BeanUtils.copyProperties(chatRequest, remoteChatRequest);
 
         String workspace = chatRequest.getWorkspace();
 
-        HttpEntity<RemoteChatRequest> entity = new HttpEntity<>(remoteChatRequest, headers);
+        HttpEntity<RemoteChatRequest> entity = new HttpEntity<>(remoteChatRequest);
         System.out.println(anythingllmConstant.workspaceUrl + "/" + workspace + "/chat");
 
         ResponseEntity<ChatResponse> response = restTemplate.exchange(
