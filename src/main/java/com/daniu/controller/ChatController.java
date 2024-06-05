@@ -8,6 +8,7 @@ import com.daniu.exception.ThrowUtils;
 import com.daniu.model.anythingllm.RemoteChatRequest;
 import com.daniu.model.chat.ChatRequest;
 import com.daniu.model.chat.ChatResponse;
+import com.daniu.model.workspace.NewWorkspaceResponse;
 import com.daniu.model.workspace.WorkspaceResponse;
 import com.daniu.model.workspace.WorkspaceResponseWrapper;
 import jakarta.annotation.Resource;
@@ -50,6 +51,26 @@ public class ChatController {
         ThrowUtils.throwIf(workspaceResponses == null, ErrorCode.OPERATION_ERROR, "获取工作空间列表失败");
 
         return ResultUtils.success(workspaceResponses.getWorkspaces());
+    }
+
+    @PostMapping(value = "/new", produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse<WorkspaceResponse> createWorkspace(@RequestBody String name) {
+        ThrowUtils.throwIf(name == null || name.isEmpty(), ErrorCode.PARAMS_ERROR, "请求参数错误");
+
+        HttpEntity<String> entity = new HttpEntity<>(name);
+
+        ResponseEntity<NewWorkspaceResponse> response = restTemplate.exchange(
+                anythingllmConstant.workspaceUrl + "/new",
+                HttpMethod.POST,
+                entity,
+                NewWorkspaceResponse.class
+        );
+
+        NewWorkspaceResponse newWorkspaceResponse = response.getBody();
+
+        ThrowUtils.throwIf(newWorkspaceResponse == null, ErrorCode.OPERATION_ERROR, "新建工作空间失败");
+
+        return ResultUtils.success(newWorkspaceResponse.getWorkspace());
     }
 
     @PostMapping(value = "/chat", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
