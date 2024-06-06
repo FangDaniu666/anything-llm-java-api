@@ -1,5 +1,7 @@
 package com.daniu.controller;
 
+import com.daniu.constant.AnythingllmConstant;
+import jakarta.annotation.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -15,6 +17,9 @@ import java.time.Duration;
 @RestController
 public class StreamChatController {
 
+    @Resource
+    private AnythingllmConstant anythingllmConstant;
+
     private final WebClient webClient;
 
     public StreamChatController() {
@@ -22,7 +27,6 @@ public class StreamChatController {
                 .responseTimeout(Duration.ofSeconds(60));
         this.webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl("http://localhost:3001")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer DBCFN9E-RBX44G9-P9N5SHN-V6VSGQC")
                 .build();
     }
@@ -33,7 +37,7 @@ public class StreamChatController {
         String payload = String.format("{\"message\": \"%s\", \"mode\": \"chat\"}", message);
 
         webClient.post()
-                .uri("/api/v1/workspace/ollama-demo/stream-chat")
+                .uri(anythingllmConstant.workspaceUrl + "/ollama-demo/stream-chat")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(payload)
                 .accept(MediaType.TEXT_EVENT_STREAM)
