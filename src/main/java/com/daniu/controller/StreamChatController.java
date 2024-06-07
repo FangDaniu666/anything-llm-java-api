@@ -2,35 +2,34 @@ package com.daniu.controller;
 
 import com.daniu.constant.AnythingllmConstant;
 import jakarta.annotation.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
 
-import java.time.Duration;
-
+/**
+ * 流式聊天控制器
+ *
+ * @author FangDaniu
+ * @since 2024/06/07
+ */
 @RestController
 public class StreamChatController {
 
     @Resource
     private AnythingllmConstant anythingllmConstant;
 
-    private final WebClient webClient;
+    @Resource
+    private WebClient webClient;
 
-    public StreamChatController() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofSeconds(60));
-        this.webClient = WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer DBCFN9E-RBX44G9-P9N5SHN-V6VSGQC")
-                .build();
-    }
-
+    /**
+     * 流式聊天
+     *
+     * @param message 消息
+     * @return {@link SseEmitter }
+     */
     @GetMapping("/stream-chat")
     public SseEmitter streamChat(@RequestParam String message) {
         SseEmitter sseEmitter = new SseEmitter();
@@ -56,4 +55,5 @@ public class StreamChatController {
 
         return sseEmitter;
     }
+
 }
