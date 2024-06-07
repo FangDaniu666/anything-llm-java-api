@@ -30,7 +30,7 @@ public class StreamChatController {
      * @param message 消息
      * @return {@link SseEmitter }
      */
-    @GetMapping("/stream-chat")
+    @GetMapping("/workspace/stream-chat")
     public SseEmitter streamChat(@RequestParam String message) {
         SseEmitter sseEmitter = new SseEmitter();
         String payload = String.format("{\"message\": \"%s\", \"mode\": \"chat\"}", message);

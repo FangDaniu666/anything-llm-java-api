@@ -73,6 +73,20 @@ public class ChatController {
         return ResultUtils.success(newWorkspaceResponse.getWorkspace());
     }
 
+    @DeleteMapping(value = "/{workspaceName}")
+    public BaseResponse<String> deleteWorkspace(@PathVariable String workspaceName) {
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                anythingllmConstant.workspaceUrl + "/" + workspaceName,
+                HttpMethod.DELETE,
+                null,
+                String.class);
+
+        ThrowUtils.throwIf(response.getStatusCode().value() != 200, ErrorCode.OPERATION_ERROR, "删除工作空间失败");
+
+        return ResultUtils.success(response.getBody());
+    }
+
     @PostMapping(value = "/chat", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<ChatResponse> chat(@RequestBody ChatRequest chatRequest) {
         ThrowUtils.throwIf(chatRequest == null, ErrorCode.PARAMS_ERROR, "请求参数错误");
