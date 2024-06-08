@@ -1,4 +1,4 @@
-package com.daniu.model.anythingllm;
+package com.daniu.model.chat;
 
 import lombok.Data;
 

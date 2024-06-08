@@ -5,7 +5,7 @@ import com.daniu.common.ErrorCode;
 import com.daniu.common.ResultUtils;
 import com.daniu.constant.AnythingllmConstant;
 import com.daniu.exception.ThrowUtils;
-import com.daniu.model.anythingllm.RemoteChatRequest;
+import com.daniu.model.chat.RemoteChatRequest;
 import com.daniu.model.chat.ChatRequest;
 import com.daniu.model.chat.ChatResponse;
 import com.daniu.model.workspace.NewWorkspaceResponse;

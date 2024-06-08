@@ -8,6 +8,7 @@ import com.daniu.exception.BusinessException;
 import com.daniu.exception.ThrowUtils;
 import com.daniu.model.document.DocumentResponse;
 import com.daniu.model.document.DocumentResponseWrapper;
+import com.daniu.model.document.DocumentsResponse;
 import jakarta.annotation.Resource;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
@@ -21,6 +22,7 @@ import org.springframework.util.MultiValueMap;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 文档控制器
@@ -37,6 +39,21 @@ public class DocumentController {
 
     @Resource
     private AnythingllmConstant anythingllmConstant;
+
+    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse<List<DocumentsResponse.FolderItem>> listDocuments() {
+
+        ResponseEntity<DocumentsResponse> response = restTemplate.exchange(
+                anythingllmConstant.documentUrl + "s",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        List<DocumentsResponse.FolderItem> items = Objects.requireNonNull(response.getBody()).getLocalFiles().getItems();
+
+        return ResultUtils.success(items);
+    }
 
     @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<List<DocumentResponse>> uploadDocument(@RequestParam("file") MultipartFile multipartFile) throws IOException {
