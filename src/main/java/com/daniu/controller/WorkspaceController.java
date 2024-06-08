@@ -8,9 +8,9 @@ import com.daniu.exception.ThrowUtils;
 import com.daniu.model.chat.RemoteChatRequest;
 import com.daniu.model.chat.ChatRequest;
 import com.daniu.model.chat.ChatResponse;
-import com.daniu.model.workspace.NewWorkspaceResponse;
-import com.daniu.model.workspace.WorkspaceResponse;
-import com.daniu.model.workspace.WorkspaceResponseWrapper;
+import com.daniu.model.workspace.*;
+import com.daniu.service.DocumentService;
+import com.daniu.service.WorkspaceService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.ParameterizedTypeReference;
@@ -29,13 +29,25 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/workspace")
-public class ChatController {
+public class WorkspaceController {
 
     @Resource
     private RestTemplate restTemplate;
 
     @Resource
     private AnythingllmConstant anythingllmConstant;
+
+    @Resource
+    private WorkspaceService workspaceService;
+
+    @Resource
+    private DocumentService documentService;
+
+    @GetMapping(value = "/{workspaceName}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse<WorkspaceGetResponse> getWorkspace(@PathVariable String workspaceName) {
+        WorkspaceGetResponse workspace = workspaceService.getWorkspaceByName(workspaceName);
+        return ResultUtils.success(workspace);
+    }
 
     @GetMapping(value = "/list")
     public BaseResponse<List<WorkspaceResponse>> listWorkspaces() {
@@ -59,18 +71,18 @@ public class ChatController {
 
         HttpEntity<String> entity = new HttpEntity<>(name);
 
-        ResponseEntity<NewWorkspaceResponse> response = restTemplate.exchange(
+        ResponseEntity<WorkspaceNewResponse> response = restTemplate.exchange(
                 anythingllmConstant.workspaceUrl + "/new",
                 HttpMethod.POST,
                 entity,
-                NewWorkspaceResponse.class
+                WorkspaceNewResponse.class
         );
 
-        NewWorkspaceResponse newWorkspaceResponse = response.getBody();
+        WorkspaceNewResponse workspaceNewResponse = response.getBody();
 
-        ThrowUtils.throwIf(newWorkspaceResponse == null, ErrorCode.OPERATION_ERROR, "新建工作空间失败");
+        ThrowUtils.throwIf(workspaceNewResponse == null, ErrorCode.OPERATION_ERROR, "新建工作空间失败");
 
-        return ResultUtils.success(newWorkspaceResponse.getWorkspace());
+        return ResultUtils.success(workspaceNewResponse.getWorkspace());
     }
 
     @DeleteMapping(value = "/{workspaceName}")
@@ -105,6 +117,17 @@ public class ChatController {
         );
 
         return ResultUtils.success(response.getBody());
+    }
+
+    @PostMapping(value = "/{workspaceName}/update-embeddings", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public BaseResponse<WorkspaceGetResponse> updateEmbeddings(@PathVariable String workspaceName) {
+        WorkspaceGetResponse deleteResponse = documentService.removeAllDocuments(workspaceName);
+        ThrowUtils.throwIf(deleteResponse == null, ErrorCode.OPERATION_ERROR, "删除 embeddings 失败");
+
+        WorkspaceGetResponse addResponse = documentService.addAllDocuments(workspaceName);
+        ThrowUtils.throwIf(addResponse == null, ErrorCode.OPERATION_ERROR, "更新 embeddings 失败");
+
+        return ResultUtils.success(addResponse);
     }
 
 }

@@ -9,6 +9,7 @@ import com.daniu.exception.ThrowUtils;
 import com.daniu.model.document.DocumentResponse;
 import com.daniu.model.document.DocumentResponseWrapper;
 import com.daniu.model.document.DocumentsResponse;
+import com.daniu.service.DocumentService;
 import jakarta.annotation.Resource;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
@@ -22,7 +23,6 @@ import org.springframework.util.MultiValueMap;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 文档控制器
@@ -40,20 +40,17 @@ public class DocumentController {
     @Resource
     private AnythingllmConstant anythingllmConstant;
 
+    @Resource
+    private DocumentService documentService;
+
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<List<DocumentsResponse.FolderItem>> listDocuments() {
+        DocumentsResponse.LocalFiles documents = documentService.getAllDocuments();
+        ThrowUtils.throwIf(documents == null, new BusinessException(ErrorCode.OPERATION_ERROR, "No documents found."));
 
-        ResponseEntity<DocumentsResponse> response = restTemplate.exchange(
-                anythingllmConstant.documentUrl + "s",
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<>() {
-                }
-        );
-        List<DocumentsResponse.FolderItem> items = Objects.requireNonNull(response.getBody()).getLocalFiles().getItems();
-
-        return ResultUtils.success(items);
+        return ResultUtils.success(documents.getItems());
     }
+
 
     @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<List<DocumentResponse>> uploadDocument(@RequestParam("file") MultipartFile multipartFile) throws IOException {

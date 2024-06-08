@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Data
-public class NewWorkspaceResponse implements Serializable {
+public class WorkspaceNewResponse implements Serializable {
 
     private WorkspaceResponse workspace;
 
