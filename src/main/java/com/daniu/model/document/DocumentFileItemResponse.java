@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class FileItem {
+public class DocumentFileItemResponse {
     private String name;
 
     private String type;

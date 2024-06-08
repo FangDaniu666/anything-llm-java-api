@@ -18,7 +18,7 @@ public class DocumentsResponse {
     public static class FolderItem {
         private String name;
         private String type;
-        private List<FileItem> items;
+        private List<DocumentFileItemResponse> items;
     }
 
 }
