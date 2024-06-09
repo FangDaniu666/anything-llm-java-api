@@ -4,6 +4,7 @@ import com.daniu.common.ErrorCode;
 import com.daniu.constant.AnythingllmConstant;
 import com.daniu.exception.BusinessException;
 import com.daniu.exception.ThrowUtils;
+import com.daniu.model.document.DocumentResponseWrapper;
 import com.daniu.model.document.DocumentsResponse;
 import com.daniu.model.workspace.WorkspaceGetResponse;
 import com.daniu.model.workspace.WorkspaceUpdateEmbedRequest;
@@ -11,10 +12,14 @@ import com.daniu.service.DocumentService;
 import com.daniu.service.WorkspaceService;
 import jakarta.annotation.Resource;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +66,28 @@ public class DocumentServiceImpl implements DocumentService {
                 .getDocuments().forEach(document -> deletes.add(document.getDocpath()));
 
         return getWorkspaceGetResponse(workspaceName, request, adds, deletes);
+    }
+
+    @Override
+    public DocumentResponseWrapper uploadDocument(File file) {
+        FileSystemResource fileResource = new FileSystemResource(file);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", fileResource);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body);
+
+        ResponseEntity<DocumentResponseWrapper> response = restTemplate.exchange(
+                anythingllmConstant.documentUrl + "/upload",
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        DocumentResponseWrapper responseBody = response.getBody();
+        ThrowUtils.throwIf(responseBody == null, new BusinessException(ErrorCode.OPERATION_ERROR, "Response body is null"));
+        return responseBody;
     }
 
     @Override
