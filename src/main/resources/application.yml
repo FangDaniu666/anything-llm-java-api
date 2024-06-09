@@ -1,6 +1,9 @@
 spring:
   application:
     name: anything-llm-java-api
+  # quartz配置
+  quartz:
+    job-store-type: memory
 anything-llm:
   url: "http://localhost:3001"
   token: "DBCFN9E-RBX44G9-P9N5SHN-V6VSGQC"
