@@ -13,12 +13,12 @@ import java.util.Set;
  * 作业初始化
  *
  * @author FangDaniu
- * @since  2024/06/01
+ * @since 2024/06/01
  */
 @Component
 public class JobInit implements ApplicationRunner {
 
-    private static final String ID = "SUMMERY";
+    private static final String ID = "Upload";
 
     @Resource
     private Scheduler scheduler;
@@ -26,24 +26,23 @@ public class JobInit implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         JobDetail jobDetail = JobBuilder.newJob(SimpleJob.class)
-                .withIdentity(ID + " 02")
+                .withIdentity(ID)
                 .storeDurably()
                 .build();
 
         CronScheduleBuilder scheduleBuilder =
                 CronScheduleBuilder.cronSchedule("0/10 * * * * ? *");
 
-        //create  task trigger
         Trigger trigger = TriggerBuilder.newTrigger()
                 .forJob(jobDetail)
-                .withIdentity(ID + " 02Trigger")
+                .withIdentity(ID + " Trigger")
                 .withSchedule(scheduleBuilder)
-                .startNow() //exceute Now
+                .startNow()
                 .build();
 
         Set<Trigger> set = new HashSet<>();
         set.add(trigger);
-        // boolean replace it will replace quartz's task in database  when the task is started
+
         scheduler.scheduleJob(jobDetail, set, true);
     }
 }
