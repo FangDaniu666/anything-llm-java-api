@@ -3,19 +3,15 @@ package com.daniu.controller;
 import com.daniu.common.BaseResponse;
 import com.daniu.common.ErrorCode;
 import com.daniu.common.ResultUtils;
-import com.daniu.constant.AnythingllmConstant;
 import com.daniu.exception.ThrowUtils;
-import com.daniu.model.chat.RemoteChatRequest;
 import com.daniu.model.chat.ChatRequest;
 import com.daniu.model.chat.ChatResponse;
 import com.daniu.model.workspace.*;
 import com.daniu.service.DocumentService;
 import com.daniu.service.WorkspaceService;
 import jakarta.annotation.Resource;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -29,12 +25,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/workspace")
 public class WorkspaceController {
-
-    @Resource
-    private RestTemplate restTemplate;
-
-    @Resource
-    private AnythingllmConstant anythingllmConstant;
 
     @Resource
     private WorkspaceService workspaceService;
@@ -71,12 +61,7 @@ public class WorkspaceController {
     @DeleteMapping(value = "/{workspaceName}")
     public BaseResponse<String> deleteWorkspace(@PathVariable String workspaceName) {
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                anythingllmConstant.workspaceUrl + "/" + workspaceName,
-                HttpMethod.DELETE,
-                null,
-                String.class);
-
+        ResponseEntity<String> response = workspaceService.deleteWorkspace(workspaceName);
         ThrowUtils.throwIf(response.getStatusCode().value() != 200, ErrorCode.OPERATION_ERROR, "删除工作空间失败");
 
         return ResultUtils.success(response.getBody());
@@ -86,18 +71,7 @@ public class WorkspaceController {
     public BaseResponse<ChatResponse> chat(@RequestBody ChatRequest chatRequest) {
         ThrowUtils.throwIf(chatRequest == null, ErrorCode.PARAMS_ERROR, "请求参数错误");
 
-        RemoteChatRequest remoteChatRequest = new RemoteChatRequest();
-        BeanUtils.copyProperties(chatRequest, remoteChatRequest);
-        String workspace = chatRequest.getWorkspace();
-
-        HttpEntity<RemoteChatRequest> entity = new HttpEntity<>(remoteChatRequest);
-
-        ResponseEntity<ChatResponse> response = restTemplate.exchange(
-                anythingllmConstant.workspaceUrl + "/" + workspace + "/chat",
-                HttpMethod.POST,
-                entity,
-                ChatResponse.class
-        );
+        ResponseEntity<ChatResponse> response = workspaceService.getChat(chatRequest);
 
         return ResultUtils.success(response.getBody());
     }
