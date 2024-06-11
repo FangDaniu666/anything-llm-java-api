@@ -13,7 +13,6 @@ import com.daniu.service.DocumentService;
 import com.daniu.service.WorkspaceService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -52,34 +51,18 @@ public class WorkspaceController {
     @GetMapping(value = "/list")
     public BaseResponse<List<WorkspaceResponse>> listWorkspaces() {
 
-        ResponseEntity<WorkspaceResponseWrapper> response = restTemplate.exchange(
-                anythingllmConstant.workspaceUrl + "s",
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<>() {
-                }
-        );
-        WorkspaceResponseWrapper workspaceResponses = response.getBody();
+        WorkspaceResponseWrapper workspaceResponses = workspaceService.getAllWorkspace();
         ThrowUtils.throwIf(workspaceResponses == null, ErrorCode.OPERATION_ERROR, "获取工作空间列表失败");
 
         return ResultUtils.success(workspaceResponses.getWorkspaces());
     }
 
+
     @PostMapping(value = "/new", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse<WorkspaceResponse> createWorkspace(@RequestBody String name) {
         ThrowUtils.throwIf(name == null || name.isEmpty(), ErrorCode.PARAMS_ERROR, "请求参数错误");
 
-        HttpEntity<String> entity = new HttpEntity<>(name);
-
-        ResponseEntity<WorkspaceNewResponse> response = restTemplate.exchange(
-                anythingllmConstant.workspaceUrl + "/new",
-                HttpMethod.POST,
-                entity,
-                WorkspaceNewResponse.class
-        );
-
-        WorkspaceNewResponse workspaceNewResponse = response.getBody();
-
+        WorkspaceNewResponse workspaceNewResponse = workspaceService.getNewWorkspace(name);
         ThrowUtils.throwIf(workspaceNewResponse == null, ErrorCode.OPERATION_ERROR, "新建工作空间失败");
 
         return ResultUtils.success(workspaceNewResponse.getWorkspace());
