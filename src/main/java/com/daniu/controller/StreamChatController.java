@@ -1,10 +1,13 @@
 package com.daniu.controller;
 
 import com.daniu.constant.AnythingllmConstant;
+import com.daniu.model.chat.ChatRequest;
+import com.daniu.model.chat.RemoteChatRequest;
 import jakarta.annotation.Resource;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author FangDaniu
  * @since 2024/06/07
  */
+
 @RestController
 public class StreamChatController {
 
@@ -27,18 +31,22 @@ public class StreamChatController {
     /**
      * 流式聊天
      *
-     * @param message 消息
+     * @param chatRequest 聊天请求
      * @return {@link SseEmitter }
      */
     @GetMapping("/workspace/stream-chat")
-    public SseEmitter streamChat(@RequestParam String message) {
+    public SseEmitter streamChat(@RequestBody ChatRequest chatRequest) {
         SseEmitter sseEmitter = new SseEmitter();
-        String payload = String.format("{\"message\": \"%s\", \"mode\": \"chat\"}", message);
+        // String payload = String.format("{\"message\": \"%s\", \"mode\": \"chat\"}", message);
+
+        RemoteChatRequest remoteChatRequest = new RemoteChatRequest();
+        BeanUtils.copyProperties(chatRequest, remoteChatRequest);
+        String workspace = chatRequest.getWorkspace();
 
         webClient.post()
-                .uri(anythingllmConstant.workspaceUrl + "/ollama-demo/stream-chat")
+                .uri(anythingllmConstant.workspaceUrl + "/" + workspace + "/stream-chat")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(payload)
+                .bodyValue(remoteChatRequest)
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
                 .bodyToFlux(String.class)

@@ -39,7 +39,8 @@ public class SimpleJob extends QuartzJobBean {
             if (files != null) {
                 for (File file : files) {
                     if (file.isFile()) {
-                        DocumentResponseWrapper response = documentService.uploadDocument(file);
+                        DocumentResponseWrapper response = documentService.
+                                uploadDocument(file);
                         log.info("Uploaded document: {} {}", file.getName(), response.isSuccess());
                         if (response.isSuccess()) {
                             boolean deleted = file.delete();
