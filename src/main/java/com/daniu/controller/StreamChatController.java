@@ -37,7 +37,6 @@ public class StreamChatController {
     @GetMapping("/workspace/stream-chat")
     public SseEmitter streamChat(@RequestBody ChatRequest chatRequest) {
         SseEmitter sseEmitter = new SseEmitter();
-        // String payload = String.format("{\"message\": \"%s\", \"mode\": \"chat\"}", message);
 
         RemoteChatRequest remoteChatRequest = new RemoteChatRequest();
         BeanUtils.copyProperties(chatRequest, remoteChatRequest);
