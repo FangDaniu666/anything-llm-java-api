@@ -83,7 +83,6 @@ public class WorkspaceController {
 
         WorkspaceGetResponse addResponse = documentService.addAllDocuments(workspaceName);
         ThrowUtils.throwIf(addResponse == null, ErrorCode.OPERATION_ERROR, "更新 embeddings 失败");
-
         return ResultUtils.success(addResponse);
     }
 
