@@ -48,7 +48,6 @@ public class StreamChatController {
                 .bodyValue(remoteChatRequest)
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .retrieve()
-
                 .bodyToFlux(String.class)
                 .doOnNext(response -> {
                     try {
